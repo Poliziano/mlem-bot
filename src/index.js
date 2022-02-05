@@ -10,7 +10,7 @@ import { Client } from "discord.js";
 import { Todo } from "./commands/todo.js";
 import { db, initialiseDatabase } from "./db.js";
 
-const TOKEN = "NzM4Nzk3ODkxNjQ0MTYyMDU4.XyRJJw.WS-HPWMNDHFMp6oCwJUG9ZlVuXM";
+const TOKEN = "NzM4Nzk3ODkxNjQ0MTYyMDU4.XyRJJw.T4J-3YZORodM6FdUJJ--FipnbUw";
 const CLIENT_ID = "738797891644162058";
 const GUILD_ID = "738496230300188712";
 
