@@ -10,9 +10,20 @@ import { Client } from "discord.js";
 import { Todo } from "./commands/todo.js";
 import { db, initialiseDatabase } from "./db.js";
 
-const TOKEN = "NzM4Nzk3ODkxNjQ0MTYyMDU4.XyRJJw.T4J-3YZORodM6FdUJJ--FipnbUw";
-const CLIENT_ID = "738797891644162058";
-const GUILD_ID = "738496230300188712";
+const TOKEN = process.env.MLEM_BOT_TOKEN;
+const APPLICATION_ID = process.env.MLEM_BOT_APPLICATION_ID;
+const GUILD_ID = process.env.MLEM_BOT_GUILD_ID;
+
+if (!TOKEN || !APPLICATION_ID || !GUILD_ID) {
+  console.error(
+    `Please ensure the required environment variables are set:
+      - MLEM_BOT_TOKEN            should be set to the token bot token
+      - MLEM_BOT_APPLICATION_ID   should be set to the bot application ID
+      - MLEM_BOT_GUILD_ID         should be set to the target channel ID`.trim()
+  );
+
+  process.exit();
+}
 
 const client = new Client({
   intents: [Intents.FLAGS.GUILDS],
@@ -41,7 +52,7 @@ async function registerCommands() {
     return [...previous, ...current.commands];
   }, []);
 
-  await rest.put(Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID), {
+  await rest.put(Routes.applicationGuildCommands(APPLICATION_ID, GUILD_ID), {
     body: slashCommands.map((command) => command.toJSON()),
   });
 }
