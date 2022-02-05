@@ -1,0 +1,14 @@
+version: '3.7'
+services:
+  mlem-bot:
+    image: mlem-bot
+    command: sh -c './wait-for mysql:3306 -t 60000 -- node src/index.js'
+    depends_on:
+      - mysql
+    restart: always
+  mysql:
+    image: mysql
+    command: mysqld --default-authentication-plugin=mysql_native_password
+    environment:
+      - MYSQL_ROOT_PASSWORD=foo
+    restart: always
