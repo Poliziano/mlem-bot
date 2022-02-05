@@ -17,7 +17,7 @@ const GUILD_ID = process.env.MLEM_BOT_GUILD_ID;
 if (!TOKEN || !APPLICATION_ID || !GUILD_ID) {
   console.error(
     `Please ensure the required environment variables are set:
-      - MLEM_BOT_TOKEN            should be set to the token bot token
+      - MLEM_BOT_TOKEN            should be set to the bot token
       - MLEM_BOT_APPLICATION_ID   should be set to the bot application ID
       - MLEM_BOT_GUILD_ID         should be set to the target channel ID`.trim()
   );
