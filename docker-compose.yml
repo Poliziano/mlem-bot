@@ -3,6 +3,10 @@ services:
   mlem-bot:
     image: mlem-bot
     command: sh -c './wait-for mysql:3306 -t 60000 -- node src/index.js'
+    environment:
+      - MLEM_BOT_TOKEN
+      - MLEM_BOT_APPLICATION_ID
+      - MLEM_BOT_GUILD_ID
     depends_on:
       - mysql
     restart: always
