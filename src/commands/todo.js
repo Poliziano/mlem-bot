@@ -44,22 +44,27 @@ export class Todo {
    * @returns {Promise<boolean>} True if handled, false otherwise.
    */
   async handle(interaction) {
-    if (interaction.isCommand() && interaction.commandName === "todo") {
-      const subcommand = interaction.options.getSubcommand();
-
-      switch (subcommand) {
-        case "create":
-          await this.#createTodo(interaction);
-          return true;
-        case "list":
-          await this.#listTodo(interaction);
-          return true;
-        case "complete":
-          await this.#completeTodo(interaction);
-          return true;
-      }
+    if (!interaction.isCommand() || interaction.commandName !== "todo") {
+      return false;
     }
-    return false;
+
+    const subcommand = interaction.options.getSubcommand();
+
+    switch (subcommand) {
+      case "create":
+        await this.#createTodo(interaction);
+        break;
+      case "list":
+        await this.#listTodo(interaction);
+        break;
+      case "complete":
+        await this.#completeTodo(interaction);
+        break;
+      default:
+        return false;
+    }
+
+    return true;
   }
 
   /**
