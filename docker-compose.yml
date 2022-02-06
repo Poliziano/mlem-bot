@@ -2,17 +2,16 @@ version: '3.7'
 services:
   mlem-bot:
     image: mlem-bot
-    command: sh -c './wait-for mysql:3306 -t 60000 -- node src/index.js'
+    command: sh -c './wait-for mariadb:3306 -t 60000 -- node src/index.js'
     environment:
       - MLEM_BOT_TOKEN
       - MLEM_BOT_APPLICATION_ID
       - MLEM_BOT_GUILD_ID
     depends_on:
-      - mysql
+      - mariadb
     restart: always
-  mysql:
-    image: mysql
-    command: mysqld --default-authentication-plugin=mysql_native_password
+  mariadb:
+    image: mariadb
     environment:
-      - MYSQL_ROOT_PASSWORD=foo
+      - MARIADB_ROOT_PASSWORD=foo
     restart: always

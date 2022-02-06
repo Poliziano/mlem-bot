@@ -33,13 +33,13 @@ const commands = [new Todo()];
 
 (async function main() {
   await initialiseDatabase(db);
-  console.log("connected to mysql");
+  console.log("connected to db");
 
   await client.login(TOKEN);
-  console.log("login successful");
+  console.log("discord login successful");
 
   await registerCommands();
-  console.log("registered application commands");
+  console.log("registered discord application commands");
 
   listen();
   console.log("listening for commands");

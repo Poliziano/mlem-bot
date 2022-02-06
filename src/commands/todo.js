@@ -5,7 +5,7 @@
 
 import { bold, SlashCommandBuilder } from "@discordjs/builders";
 import "../db.js";
-import { asyncQuery, db } from "../db.js";
+import { db } from "../db.js";
 
 export class Todo {
   commands = [
@@ -69,7 +69,7 @@ export class Todo {
     const description = interaction.options.getString("description");
     const query = `INSERT INTO todo.todos (description) VALUES ("${description}")`;
 
-    await asyncQuery(db, query);
+    await (await db.getConnection()).query(query);
     await interaction.reply(`Recorded todo: ${description}`);
   }
 
@@ -79,7 +79,7 @@ export class Todo {
    */
   async #listTodo(interaction) {
     const query = `SELECT * FROM todo.todos`;
-    const result = await asyncQuery(db, query);
+    const result = await (await db.getConnection()).query(query);
 
     if (result.length === 0) {
       return await interaction.reply("There are no tasks!");
@@ -99,7 +99,7 @@ export class Todo {
     const id = interaction.options.getNumber("id");
     const query = `DELETE FROM todo.todos WHERE id = ${id}`;
 
-    await asyncQuery(db, query);
+    await (await db.getConnection()).query(query);
     await interaction.reply(`Task completed`);
   }
 }
