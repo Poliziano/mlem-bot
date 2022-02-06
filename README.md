@@ -10,11 +10,10 @@ Create a new application, following the instructions on [setting up a bot applic
 
 ### Setting up env variables
 
-There are three environment variables required:
+There are two environment variables required:
 
 - `MLEM_BOT_TOKEN` should be set to the bot token.
 - `MLEM_BOT_APPLICATION_ID` should be set to the bot application ID.
-- `MLEM_BOT_GUILD_ID` should be set to the target channel ID.
 
 ### Running the bot
 

@@ -1,8 +1,3 @@
-/**
- * @typedef {import("discord.js").CommandInteraction<import("discord.js").CacheType>} CommandInteraction
- * @typedef {import("discord.js").ButtonInteraction<import("discord.js").CacheType>} ButtonInteraction
- */
-
 import { REST } from "@discordjs/rest";
 import { Routes } from "discord-api-types/rest/v9";
 import { Intents } from "discord.js";
@@ -12,14 +7,12 @@ import { db, initialiseDatabase } from "./db.js";
 
 const TOKEN = process.env.MLEM_BOT_TOKEN;
 const APPLICATION_ID = process.env.MLEM_BOT_APPLICATION_ID;
-const GUILD_ID = process.env.MLEM_BOT_GUILD_ID;
 
-if (!TOKEN || !APPLICATION_ID || !GUILD_ID) {
+if (!TOKEN || !APPLICATION_ID) {
   console.error(
     `Please ensure the required environment variables are set:
       - MLEM_BOT_TOKEN            should be set to the bot token
-      - MLEM_BOT_APPLICATION_ID   should be set to the bot application ID
-      - MLEM_BOT_GUILD_ID         should be set to the target channel ID`.trim()
+      - MLEM_BOT_APPLICATION_ID   should be set to the bot application ID`.trim()
   );
 
   process.exit();
@@ -52,7 +45,7 @@ async function registerCommands() {
     return [...previous, ...current.commands];
   }, []);
 
-  await rest.put(Routes.applicationGuildCommands(APPLICATION_ID, GUILD_ID), {
+  await rest.put(Routes.applicationCommands(APPLICATION_ID), {
     body: slashCommands.map((command) => command.toJSON()),
   });
 }
@@ -60,7 +53,10 @@ async function registerCommands() {
 function listen() {
   client.on("interactionCreate", async (interaction) => {
     for (const command of commands) {
-      const processed = await command.handle(interaction);
+      const processed = await command.handle(
+        await db.getConnection(),
+        interaction
+      );
 
       if (processed) {
         break;

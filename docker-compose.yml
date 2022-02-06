@@ -6,7 +6,6 @@ services:
     environment:
       - MLEM_BOT_TOKEN
       - MLEM_BOT_APPLICATION_ID
-      - MLEM_BOT_GUILD_ID
     depends_on:
       - mariadb
     restart: always

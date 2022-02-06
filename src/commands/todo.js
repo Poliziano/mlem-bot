@@ -1,11 +1,11 @@
-/**
- * @typedef {import("discord.js").Interaction<import("discord.js").CacheType>} Interaction
- * @typedef {import("discord.js").CommandInteraction<import("discord.js").CacheType>} CommandInteraction
- */
-
 import { bold, SlashCommandBuilder } from "@discordjs/builders";
 import "../db.js";
-import { db } from "../db.js";
+
+/**
+ * @typedef {import("mariadb").PoolConnection} PoolConnection
+ * @typedef {import("discord.js").Interaction} Interaction
+ * @typedef {import("discord.js").CommandInteraction} CommandInteraction
+ */
 
 export class Todo {
   commands = [
@@ -20,6 +20,14 @@ export class Todo {
             option
               .setName("description")
               .setDescription("Todo description")
+              .setRequired(true)
+          )
+          .addStringOption((option) =>
+            option
+              .setName("due")
+              .setDescription(
+                "Due date of the task using the format 'YYYY-MM-DD:HH:MM'"
+              )
               .setRequired(true)
           )
       )
@@ -40,10 +48,11 @@ export class Todo {
   ];
 
   /**
+   * @param {PoolConnection} db
    * @param {Interaction} interaction
    * @returns {Promise<boolean>} True if handled, false otherwise.
    */
-  async handle(interaction) {
+  async handle(db, interaction) {
     if (!interaction.isCommand() || interaction.commandName !== "todo") {
       return false;
     }
@@ -52,13 +61,13 @@ export class Todo {
 
     switch (subcommand) {
       case "create":
-        await this.#createTodo(interaction);
+        await this.#createTodo(db, interaction);
         break;
       case "list":
-        await this.#listTodo(interaction);
+        await this.#listTodo(db, interaction);
         break;
       case "complete":
-        await this.#completeTodo(interaction);
+        await this.#completeTodo(db, interaction);
         break;
       default:
         return false;
@@ -68,23 +77,31 @@ export class Todo {
   }
 
   /**
+   * @param {PoolConnection} db
    * @param {CommandInteraction} interaction
    */
-  async #createTodo(interaction) {
+  async #createTodo(db, interaction) {
     const description = interaction.options.getString("description");
-    const query = `INSERT INTO todo.todos (description) VALUES ("${description}")`;
+    const due = interaction.options.getString("due");
 
-    await (await db.getConnection()).query(query);
+    if (Date.parse(due) <= Date.now()) {
+      return interaction.reply("Invalid due date!");
+    }
+
+    const query = `INSERT INTO todo.todos (description, due) VALUES (?, ?)`;
+    const values = [description, due];
+
+    await db.query(query, values);
     await interaction.reply(`Recorded todo: ${description}`);
   }
 
   /**
-   *
+   * @param {PoolConnection} db
    * @param {CommandInteraction} interaction
    */
-  async #listTodo(interaction) {
+  async #listTodo(db, interaction) {
     const query = `SELECT * FROM todo.todos`;
-    const result = await (await db.getConnection()).query(query);
+    const result = await db.query(query);
 
     if (result.length === 0) {
       return await interaction.reply("There are no tasks!");
@@ -98,13 +115,14 @@ export class Todo {
   }
 
   /**
+   * @param {PoolConnection} db
    * @param {CommandInteraction} interaction
    */
-  async #completeTodo(interaction) {
+  async #completeTodo(db, interaction) {
     const id = interaction.options.getNumber("id");
     const query = `DELETE FROM todo.todos WHERE id = ${id}`;
 
-    await (await db.getConnection()).query(query);
+    await db.query(query);
     await interaction.reply(`Task completed`);
   }
 }
